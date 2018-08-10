@@ -30,7 +30,7 @@ public class cake {
                     .skip(1)
                     .toArray();
 
-            int max = solve(layers, 0, 0, new int[layers.length]);
+            int max = solve(layers, 0, 0);
             System.out.println(max);
             printWriter.println(max);
         }
@@ -46,39 +46,25 @@ public class cake {
         return diameterOfPreviousLayer == 0 || diameterOfLayer <= diameterOfPreviousLayer;
     }
 
-    public static int solve(int[] layers, int currentLayer, int diameterOfPreviousLayer, int[] memo) {
+    public static int solve(int[] layers, int currentLayer, int diameterOfPreviousLayer) {
         int diameterOfCurrentLayer = layers[currentLayer];
 
-//        System.out.println(String.format("Current layer: %s Diameter: %s", currentLayer, diameterOfCurrentLayer));
-
-        // This covers the last layer
         if (currentLayer == layers.length - 1) {
-            if (canTakeLayer(diameterOfCurrentLayer, diameterOfPreviousLayer)) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-
-//        if (memo[currentLayer] != 0) {
-        int maxHeightIfLayerIsTaken;
-        if (canTakeLayer(diameterOfCurrentLayer, diameterOfPreviousLayer)) {
-            maxHeightIfLayerIsTaken = 1 + solve(layers, currentLayer + 1, diameterOfCurrentLayer, memo);
+            return canTakeLayer(diameterOfCurrentLayer, diameterOfPreviousLayer) ? 1 : 0;
         } else {
-            // we can't take the layer
-//            System.out.println(String.format("Can't take layer c: %s d: %s pd: %s", currentLayer, diameterOfCurrentLayer, diameterOfPreviousLayer));
-            maxHeightIfLayerIsTaken = 0;
+            int maxHeight;
+            int maxSizeIfLayerIsSkipped = solve(layers, currentLayer + 1, diameterOfPreviousLayer);
+            int maxHeightIfLayerIsTaken;
+
+            if (canTakeLayer(diameterOfCurrentLayer, diameterOfPreviousLayer)) {
+                maxHeightIfLayerIsTaken = 1 + solve(layers, currentLayer + 1, diameterOfCurrentLayer);
+                maxHeight = max(maxHeightIfLayerIsTaken, maxSizeIfLayerIsSkipped);
+            } else {
+                maxHeight = maxSizeIfLayerIsSkipped;
+            }
+
+            return maxHeight;
         }
-
-        int maxSizeIfLayerIsSkipped = solve(layers, currentLayer + 1, diameterOfPreviousLayer, memo);
-
-//        System.out.println(String.format("t: %s l: %s", maxHeightIfLayerIsTaken, maxSizeIfLayerIsSkipped));
-        int answer = max(maxHeightIfLayerIsTaken, maxSizeIfLayerIsSkipped);
-        memo[currentLayer] = answer;
-        return answer;
-//        } else {
-//            return memo[currentLayer];
-//        }
     }
 
 
